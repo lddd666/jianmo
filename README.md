@@ -38,8 +38,8 @@
 
 ```bash
 # 克隆项目
-git clone https://github.com/lddd666/渐墨.git
-cd 渐墨
+git clone https://github.com/lddd666/jianmo.git
+cd jianmo
 
 # 安装依赖
 pip install -r requirements.txt
