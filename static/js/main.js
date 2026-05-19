@@ -9,6 +9,127 @@ const state = {
     isProcessing: false,
 };
 
+// Local storage key for user presets
+const PRESETS_STORAGE_KEY = 'inkwallpaper_presets';
+
+// Built-in presets (cannot be deleted)
+const BUILTIN_PRESETS = {
+    '📖 Kindle漫画': {
+        devicePreset: 'kindle_paperwhite',
+        customWidth: '1404',
+        customHeight: '1872',
+        resizeMode: 'fill',
+        enableCrop: false,
+        cropSliderX: '0',
+        cropSliderY: '0',
+        grayscaleMethod: 'luminosity',
+        contrast: '1.4',
+        brightness: '1.1',
+        sharpness: '1.5',
+        gamma: '1.2',
+        blur: '0',
+        ditherMethod: 'floyd_steinberg',
+        threshold: '128',
+        invertColors: false,
+        outputFormat: 'png',
+    },
+    '📚 电子书封面': {
+        devicePreset: 'kindle_paperwhite',
+        customWidth: '1404',
+        customHeight: '1872',
+        resizeMode: 'fill',
+        enableCrop: false,
+        cropSliderX: '0',
+        cropSliderY: '0',
+        grayscaleMethod: 'luminosity',
+        contrast: '1.3',
+        brightness: '1.0',
+        sharpness: '2.0',
+        gamma: '1.1',
+        blur: '0',
+        ditherMethod: 'none',
+        threshold: '128',
+        invertColors: false,
+        outputFormat: 'png',
+    },
+    '🎨 复古艺术风': {
+        devicePreset: 'kobo_libra_2',
+        customWidth: '1404',
+        customHeight: '1872',
+        resizeMode: 'fill',
+        enableCrop: false,
+        cropSliderX: '0',
+        cropSliderY: '0',
+        grayscaleMethod: 'luminosity',
+        contrast: '1.2',
+        brightness: '1.0',
+        sharpness: '1.0',
+        gamma: '1.4',
+        blur: '0',
+        ditherMethod: 'atkinson',
+        threshold: '128',
+        invertColors: false,
+        outputFormat: 'png',
+    },
+    '📱 手机壁纸': {
+        devicePreset: 'iphone_15',
+        customWidth: '1179',
+        customHeight: '2556',
+        resizeMode: 'fill',
+        enableCrop: false,
+        cropSliderX: '0',
+        cropSliderY: '0',
+        grayscaleMethod: 'luminosity',
+        contrast: '1.2',
+        brightness: '1.0',
+        sharpness: '1.5',
+        gamma: '1.0',
+        blur: '0',
+        ditherMethod: 'none',
+        threshold: '128',
+        invertColors: false,
+        outputFormat: 'png',
+    },
+    '🖼️ 高对比度': {
+        devicePreset: '',
+        customWidth: '1404',
+        customHeight: '1872',
+        resizeMode: 'stretch',
+        enableCrop: false,
+        cropSliderX: '0',
+        cropSliderY: '0',
+        grayscaleMethod: 'luminosity',
+        contrast: '2.0',
+        brightness: '1.1',
+        sharpness: '2.5',
+        gamma: '1.3',
+        blur: '0',
+        ditherMethod: 'threshold',
+        threshold: '128',
+        invertColors: false,
+        outputFormat: 'png',
+    },
+    '📄 文字扫描件': {
+        devicePreset: '',
+        customWidth: '1404',
+        customHeight: '1872',
+        resizeMode: 'stretch',
+        enableCrop: false,
+        cropSliderX: '0',
+        cropSliderY: '0',
+        grayscaleMethod: 'luminosity',
+        contrast: '2.5',
+        brightness: '1.2',
+        sharpness: '3.0',
+        gamma: '0.8',
+        blur: '0',
+        ditherMethod: 'threshold',
+        threshold: '150',
+        invertColors: false,
+        outputFormat: 'png',
+    },
+};
+
 // Presets data
 const presets = {
     // Kindle
@@ -59,6 +180,12 @@ const previewInfo = $('#previewInfo');
 const previewLoading = $('#previewLoading');
 const previewWrapper = $('#previewWrapper');
 
+const presetSelect = $('#presetSelect');
+const btnLoadPreset = $('#btnLoadPreset');
+const btnDeletePreset = $('#btnDeletePreset');
+const btnSavePreset = $('#btnSavePreset');
+const presetName = $('#presetName');
+
 const devicePreset = $('#devicePreset');
 const customSizeRow = $('#customSizeRow');
 const customWidth = $('#customWidth');
@@ -86,6 +213,13 @@ const thresholdSlider = $('#threshold');
 const invertColors = $('#invertColors');
 const outputFormat = $('#outputFormat');
 
+// Transform buttons
+const btnRotateLeft = $('#btnRotateLeft');
+const btnRotate180 = $('#btnRotate180');
+const btnRotateRight = $('#btnRotateRight');
+const btnFlipH = $('#btnFlipH');
+const btnFlipV = $('#btnFlipV');
+
 const btnPreview = $('#btnPreview');
 const btnDownload = $('#btnDownload');
 const btnResetImage = $('#btnResetImage');
@@ -94,6 +228,13 @@ const tabOriginal = $('#tabOriginal');
 
 // Current display mode: 'effect' or 'original'
 let currentTab = 'effect';
+
+// Transform state (accumulated)
+let transformState = {
+    rotation: 0,  // 0, 90, 180, 270
+    flipH: false,
+    flipV: false
+};
 
 // ==================== Tab Switching ====================
 function initTabs() {
@@ -147,6 +288,264 @@ function showToast(message, type = 'info') {
     }, 3000);
 }
 
+// ==================== Preset Management ====================
+function loadPresetsFromStorage() {
+    try {
+        const data = localStorage.getItem(PRESETS_STORAGE_KEY);
+        return data ? JSON.parse(data) : {};
+    } catch (e) {
+        return {};
+    }
+}
+
+function savePresetsToStorage(presets) {
+    try {
+        localStorage.setItem(PRESETS_STORAGE_KEY, JSON.stringify(presets));
+    } catch (e) {
+        showToast('保存预设失败：存储空间不足', 'error');
+    }
+}
+
+function refreshPresetList() {
+    const userPresets = loadPresetsFromStorage();
+    const userNames = Object.keys(userPresets);
+    const builtinNames = Object.keys(BUILTIN_PRESETS);
+
+    // Clear existing options
+    presetSelect.innerHTML = '<option value="">-- 选择预设方案 --</option>';
+
+    // Add built-in presets group
+    if (builtinNames.length > 0) {
+        const builtinGroup = document.createElement('optgroup');
+        builtinGroup.label = '内置预设';
+        builtinNames.forEach(name => {
+            const opt = document.createElement('option');
+            opt.value = name;
+            opt.textContent = name;
+            opt.dataset.builtin = 'true';
+            builtinGroup.appendChild(opt);
+        });
+        presetSelect.appendChild(builtinGroup);
+    }
+
+    // Add user presets group
+    if (userNames.length > 0) {
+        const userGroup = document.createElement('optgroup');
+        userGroup.label = '我的预设';
+        userNames.forEach(name => {
+            const opt = document.createElement('option');
+            opt.value = name;
+            opt.textContent = name;
+            userGroup.appendChild(opt);
+        });
+        presetSelect.appendChild(userGroup);
+    }
+
+    btnLoadPreset.disabled = true;
+    btnDeletePreset.disabled = true;
+    btnDeletePreset.style.display = 'none';
+}
+
+function getCurrentSettings() {
+    return {
+        rotation: transformState.rotation,
+        flipH: transformState.flipH,
+        flipV: transformState.flipV,
+        devicePreset: devicePreset.value,
+        customWidth: customWidth.value,
+        customHeight: customHeight.value,
+        resizeMode: resizeMode.value,
+        enableCrop: enableCrop.checked,
+        cropSliderX: cropSliderX.value,
+        cropSliderY: cropSliderY.value,
+        grayscaleMethod: grayscaleMethod.value,
+        contrast: contrastSlider.value,
+        brightness: brightnessSlider.value,
+        sharpness: sharpnessSlider.value,
+        gamma: gammaSlider.value,
+        blur: blurSlider.value,
+        ditherMethod: ditherMethod.value,
+        threshold: thresholdSlider.value,
+        invertColors: invertColors.checked,
+        outputFormat: outputFormat.value,
+    };
+}
+
+function applySettingsToControls(settings) {
+    // Transform
+    if (settings.rotation !== undefined) transformState.rotation = settings.rotation;
+    if (settings.flipH !== undefined) transformState.flipH = settings.flipH;
+    if (settings.flipV !== undefined) transformState.flipV = settings.flipV;
+    updateTransformButtons();
+
+    // Device preset
+    if (settings.devicePreset !== undefined) {
+        devicePreset.value = settings.devicePreset;
+        customSizeRow.style.display = settings.devicePreset === 'custom' ? 'flex' : 'none';
+    }
+    if (settings.customWidth !== undefined) customWidth.value = settings.customWidth;
+    if (settings.customHeight !== undefined) customHeight.value = settings.customHeight;
+    if (settings.resizeMode !== undefined) resizeMode.value = settings.resizeMode;
+
+    // Crop
+    if (settings.enableCrop !== undefined) {
+        enableCrop.checked = settings.enableCrop;
+        state.cropEnabled = settings.enableCrop;
+        cropControls.style.display = settings.enableCrop ? 'block' : 'none';
+        cropOverlay.style.display = settings.enableCrop ? 'block' : 'none';
+    }
+
+    // Grayscale
+    if (settings.grayscaleMethod !== undefined) grayscaleMethod.value = settings.grayscaleMethod;
+
+    // Adjustments
+    if (settings.contrast !== undefined) {
+        contrastSlider.value = settings.contrast;
+        $('#contrastValue').textContent = settings.contrast;
+    }
+    if (settings.brightness !== undefined) {
+        brightnessSlider.value = settings.brightness;
+        $('#brightnessValue').textContent = settings.brightness;
+    }
+    if (settings.sharpness !== undefined) {
+        sharpnessSlider.value = settings.sharpness;
+        $('#sharpnessValue').textContent = settings.sharpness;
+    }
+    if (settings.gamma !== undefined) {
+        gammaSlider.value = settings.gamma;
+        $('#gammaValue').textContent = settings.gamma;
+    }
+    if (settings.blur !== undefined) {
+        blurSlider.value = settings.blur;
+        $('#blurValue').textContent = settings.blur;
+    }
+
+    // Dithering
+    if (settings.ditherMethod !== undefined) {
+        ditherMethod.value = settings.ditherMethod;
+        thresholdGroup.style.display = settings.ditherMethod === 'threshold' ? 'block' : 'none';
+    }
+    if (settings.threshold !== undefined) {
+        thresholdSlider.value = settings.threshold;
+        $('#thresholdValue').textContent = settings.threshold;
+    }
+
+    // Invert
+    if (settings.invertColors !== undefined) invertColors.checked = settings.invertColors;
+
+    // Output format
+    if (settings.outputFormat !== undefined) outputFormat.value = settings.outputFormat;
+
+    // Reset crop box after applying settings (this recalculates from new device ratio)
+    if (state.cropEnabled && state.imageId) {
+        resetCropBox();
+        updateCropOverlay();
+        // Apply crop slider values after resetCropBox
+        if (settings.cropSliderX !== undefined) {
+            cropSliderX.value = settings.cropSliderX;
+            cropSliderXValue.textContent = settings.cropSliderX;
+        }
+        if (settings.cropSliderY !== undefined) {
+            cropSliderY.value = settings.cropSliderY;
+            cropSliderYValue.textContent = settings.cropSliderY;
+        }
+        applyCropFromSliders();
+    }
+}
+
+function initPresetSystem() {
+    refreshPresetList();
+
+    // Enable/disable load/delete buttons when selection changes
+    presetSelect.addEventListener('change', () => {
+        const hasSelection = presetSelect.value !== '';
+        btnLoadPreset.disabled = !hasSelection;
+        
+        // Check if selected preset is built-in
+        const selectedOption = presetSelect.options[presetSelect.selectedIndex];
+        const isBuiltin = selectedOption && selectedOption.dataset.builtin === 'true';
+        btnDeletePreset.disabled = !hasSelection || isBuiltin;
+        btnDeletePreset.style.display = isBuiltin ? 'none' : '';
+    });
+
+    // Save preset
+    btnSavePreset.addEventListener('click', () => {
+        const name = presetName.value.trim();
+        if (!name) {
+            showToast('请输入预设名称', 'error');
+            presetName.focus();
+            return;
+        }
+
+        const presets = loadPresetsFromStorage();
+        const isOverwrite = presets.hasOwnProperty(name);
+
+        if (isOverwrite) {
+            if (!confirm(`预设 "${name}" 已存在，是否覆盖？`)) return;
+        }
+
+        presets[name] = getCurrentSettings();
+        savePresetsToStorage(presets);
+        refreshPresetList();
+
+        // Select the newly saved preset
+        presetSelect.value = name;
+        btnLoadPreset.disabled = false;
+        btnDeletePreset.disabled = false;
+
+        presetName.value = '';
+        showToast(isOverwrite ? `预设 "${name}" 已更新` : `预设 "${name}" 已保存`, 'success');
+    });
+
+    // Allow saving with Enter key
+    presetName.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+            btnSavePreset.click();
+        }
+    });
+
+    // Load preset (supports both built-in and user presets)
+    btnLoadPreset.addEventListener('click', () => {
+        const name = presetSelect.value;
+        if (!name) return;
+
+        // Check built-in presets first, then user presets
+        let settings = BUILTIN_PRESETS[name];
+        if (!settings) {
+            const userPresets = loadPresetsFromStorage();
+            settings = userPresets[name];
+        }
+
+        if (!settings) {
+            showToast('预设未找到', 'error');
+            return;
+        }
+
+        applySettingsToControls(settings);
+        showToast(`已加载预设 "${name}"`, 'success');
+
+        // Trigger preview if image is loaded
+        if (state.imageId) {
+            setTimeout(() => generatePreview(), 300);
+        }
+    });
+
+    // Delete preset (only user presets can be deleted)
+    btnDeletePreset.addEventListener('click', () => {
+        const name = presetSelect.value;
+        if (!name || BUILTIN_PRESETS[name]) return;
+
+        if (!confirm(`确定要删除预设 "${name}" 吗？`)) return;
+
+        const presets = loadPresetsFromStorage();
+        delete presets[name];
+        savePresetsToStorage(presets);
+        refreshPresetList();
+
+        showToast(`预设 "${name}" 已删除`, 'success');
+    });
+}
+
 // ==================== Reset Functions ====================
 function initResetButtons() {
     document.querySelectorAll('.btn-reset').forEach(btn => {
@@ -159,6 +558,12 @@ function initResetButtons() {
 
 function resetSection(section) {
     switch (section) {
+        case 'preset':
+            presetSelect.value = '';
+            presetName.value = '';
+            btnLoadPreset.disabled = true;
+            btnDeletePreset.disabled = true;
+            break;
         case 'device':
             devicePreset.value = '';
             customSizeRow.style.display = 'none';
@@ -195,6 +600,8 @@ function resetSection(section) {
             $('#thresholdValue').textContent = '128';
             break;
         case 'other':
+            transformState = { rotation: 0, flipH: false, flipV: false };
+            updateTransformButtons();
             invertColors.checked = false;
             break;
         case 'output':
@@ -318,6 +725,11 @@ function resetImage() {
 // ==================== Settings Collection ====================
 function getSettings() {
     const settings = {};
+
+    // Transform
+    if (transformState.rotation !== 0) settings.rotation = transformState.rotation;
+    if (transformState.flipH) settings.flip_h = true;
+    if (transformState.flipV) settings.flip_v = true;
 
     const preset = devicePreset.value;
     if (preset && preset !== 'custom') {
@@ -525,8 +937,8 @@ function calculateCropFromRatio() {
     const ar = getTargetAspectRatio();
     if (!ar || state.originalWidth <= 0 || state.originalHeight <= 0) return null;
 
-    const imgW = state.originalWidth;
-    const imgH = state.originalHeight;
+    const imgW = getEffectiveWidth();
+    const imgH = getEffectiveHeight();
     const imgRatio = imgW / imgH;
 
     let cropW, cropH, canSlideX = false, canSlideY = false;
@@ -580,7 +992,7 @@ function resetCropBox() {
  */
 function applyCropFromSliders() {
     if (!cropLayout) {
-        state.cropBox = { x: 0, y: 0, w: state.originalWidth, h: state.originalHeight };
+        state.cropBox = { x: 0, y: 0, w: getEffectiveWidth(), h: getEffectiveHeight() };
         updateCropOverlay();
         return;
     }
@@ -613,13 +1025,25 @@ function updateCropInfo() {
     }
 }
 
+function getEffectiveWidth() {
+    const rot = transformState.rotation;
+    return (rot === 90 || rot === 270) ? state.originalHeight : state.originalWidth;
+}
+
+function getEffectiveHeight() {
+    const rot = transformState.rotation;
+    return (rot === 90 || rot === 270) ? state.originalWidth : state.originalHeight;
+}
+
 function getDisplayScale() {
     if (!previewImage.naturalWidth) return { scaleX: 1, scaleY: 1, displayWidth: 1, displayHeight: 1 };
     const displayWidth = previewImage.clientWidth;
     const displayHeight = previewImage.clientHeight;
+    const imgW = getEffectiveWidth();
+    const imgH = getEffectiveHeight();
     return {
-        scaleX: displayWidth / state.originalWidth,
-        scaleY: displayHeight / state.originalHeight,
+        scaleX: displayWidth / imgW,
+        scaleY: displayHeight / imgH,
         displayWidth,
         displayHeight,
     };
@@ -711,6 +1135,26 @@ function initCrop() {
     });
 }
 
+// ==================== Transform Controls ====================
+function updateTransformButtons() {
+    btnFlipH.classList.toggle('active', transformState.flipH);
+    btnFlipV.classList.toggle('active', transformState.flipV);
+}
+
+function applyTransform(type) {
+    if (!state.imageId) return;
+    switch(type) {
+        case 'rotate_left': transformState.rotation = (transformState.rotation - 90 + 360) % 360; break;
+        case 'rotate_right': transformState.rotation = (transformState.rotation + 90) % 360; break;
+        case 'rotate_180': transformState.rotation = (transformState.rotation + 180) % 360; break;
+        case 'flip_h': transformState.flipH = !transformState.flipH; break;
+        case 'flip_v': transformState.flipV = !transformState.flipV; break;
+    }
+    updateTransformButtons();
+    clearTimeout(previewDebounce);
+    previewDebounce = setTimeout(() => { generatePreview(); }, 200);
+}
+
 // ==================== Controls Binding ====================
 function initControls() {
     devicePreset.addEventListener('change', () => {
@@ -739,6 +1183,13 @@ function initControls() {
 
     btnPreview.addEventListener('click', generatePreview);
     btnDownload.addEventListener('click', downloadImage);
+
+    // Transform button events
+    btnRotateLeft.addEventListener('click', () => applyTransform('rotate_left'));
+    btnRotate180.addEventListener('click', () => applyTransform('rotate_180'));
+    btnRotateRight.addEventListener('click', () => applyTransform('rotate_right'));
+    btnFlipH.addEventListener('click', () => applyTransform('flip_h'));
+    btnFlipV.addEventListener('click', () => applyTransform('flip_v'));
 }
 
 // ==================== Auto-preview on Setting Changes ====================
@@ -774,6 +1225,32 @@ function initAutoPreview() {
     });
 }
 
+// ==================== Accordion (Collapsible Sections) ====================
+function initAccordion() {
+    document.querySelectorAll('.section-header[data-toggle]').forEach(header => {
+        header.addEventListener('click', (e) => {
+            // Don't toggle if clicking a button inside the header
+            if (e.target.closest('.btn-reset')) return;
+
+            const section = header.closest('.control-section');
+            if (!section) return;
+
+            const isCollapsed = section.classList.contains('collapsed');
+            const icon = header.querySelector('.collapse-icon');
+
+            if (isCollapsed) {
+                // Expand
+                section.classList.remove('collapsed');
+                if (icon) icon.textContent = '▼';
+            } else {
+                // Collapse
+                section.classList.add('collapsed');
+                if (icon) icon.textContent = '▶';
+            }
+        });
+    });
+}
+
 // ==================== Window Resize Handler ====================
 function initResizeHandler() {
     window.addEventListener('resize', () => {
@@ -792,6 +1269,8 @@ function init() {
     initResizeHandler();
     initResetButtons();
     initTabs();
+    initPresetSystem();
+    initAccordion();
 }
 
 document.addEventListener('DOMContentLoaded', init);

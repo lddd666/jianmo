@@ -63,27 +63,36 @@ def allowed_file(filename):
 
 
 def floyd_steinberg_dithering(image):
-    """Floyd-Steinberg dithering algorithm"""
-    img_array = np.array(image, dtype=np.float64)
-    height, width = img_array.shape
+    """Floyd-Steinberg dithering algorithm (optimized)"""
+    img = np.array(image, dtype=np.float64)
+    h, w = img.shape
 
-    for y in range(height):
-        for x in range(width):
-            old_pixel = img_array[y, x]
-            new_pixel = 255.0 if old_pixel > 127.5 else 0.0
-            img_array[y, x] = new_pixel
-            error = old_pixel - new_pixel
+    # Pre-computed error diffusion fractions
+    R = 0.4375    # 7/16 - right
+    DL = 0.1875   # 3/16 - down-left
+    D = 0.3125    # 5/16 - down
+    DR = 0.0625   # 1/16 - down-right
 
-            if x + 1 < width:
-                img_array[y, x + 1] += error * 7 / 16
-            if y + 1 < height:
-                if x - 1 >= 0:
-                    img_array[y + 1, x - 1] += error * 3 / 16
-                img_array[y + 1, x] += error * 5 / 16
-                if x + 1 < width:
-                    img_array[y + 1, x + 1] += error * 1 / 16
+    for y in range(h):
+        row = img[y]
+        nxt = img[y + 1] if y + 1 < h else None
 
-    return Image.fromarray(np.clip(img_array, 0, 255).astype(np.uint8), mode='L')
+        for x in range(w):
+            old = row[x]
+            new = 255.0 if old > 127.5 else 0.0
+            row[x] = new
+            err = old - new
+
+            if x + 1 < w:
+                row[x + 1] += err * R
+            if nxt is not None:
+                if x > 0:
+                    nxt[x - 1] += err * DL
+                nxt[x] += err * D
+                if x + 1 < w:
+                    nxt[x + 1] += err * DR
+
+    return Image.fromarray(np.clip(img, 0, 255).astype(np.uint8), mode='L')
 
 
 def ordered_dithering(image, matrix_size=4):
@@ -123,30 +132,43 @@ def ordered_dithering(image, matrix_size=4):
 
 
 def atkinson_dithering(image):
-    """Atkinson dithering algorithm"""
-    img_array = np.array(image, dtype=np.float64)
-    height, width = img_array.shape
+    """Atkinson dithering algorithm (optimized)"""
+    img = np.array(image, dtype=np.float64)
+    h, w = img.shape
 
-    for y in range(height):
-        for x in range(width):
-            old_pixel = img_array[y, x]
-            new_pixel = 255.0 if old_pixel > 127.5 else 0.0
-            img_array[y, x] = new_pixel
-            error = (old_pixel - new_pixel) / 8.0
+    # Pre-compute fraction
+    FRAC = 0.125  # 1/8
 
-            # Atkinson distributes error to 6 neighbors (not 7 like Floyd-Steinberg)
-            neighbors = [
-                (0, 1), (0, 2),
-                (1, -1), (1, 0), (1, 1),
-                (2, 0)
-            ]
+    for y in range(h):
+        row = img[y]
+        nxt1 = img[y + 1] if y + 1 < h else None
+        nxt2 = img[y + 2] if y + 2 < h else None
 
-            for dy, dx in neighbors:
-                ny, nx = y + dy, x + dx
-                if 0 <= ny < height and 0 <= nx < width:
-                    img_array[ny, nx] += error
+        for x in range(w):
+            old = row[x]
+            new = 255.0 if old > 127.5 else 0.0
+            row[x] = new
+            err = (old - new) * FRAC
 
-    return Image.fromarray(np.clip(img_array, 0, 255).astype(np.uint8), mode='L')
+            # Same row: right, right+1
+            if x + 1 < w:
+                row[x + 1] += err
+            if x + 2 < w:
+                row[x + 2] += err
+
+            # Next row: left, center, right
+            if nxt1 is not None:
+                if x > 0:
+                    nxt1[x - 1] += err
+                nxt1[x] += err
+                if x + 1 < w:
+                    nxt1[x + 1] += err
+
+            # Two rows down: center
+            if nxt2 is not None:
+                nxt2[x] += err
+
+    return Image.fromarray(np.clip(img, 0, 255).astype(np.uint8), mode='L')
 
 
 def threshold_dithering(image, threshold=128):
@@ -171,6 +193,19 @@ def process_image(image, settings):
         image = image.convert('RGB')
     elif image.mode not in ('RGB', 'L'):
         image = image.convert('RGB')
+
+    # Apply rotation/flip (before crop, crop coordinates are in rotated space)
+    rotation = settings.get('rotation', 0)
+    if rotation == 90:
+        image = image.transpose(Image.ROTATE_90)
+    elif rotation == 180:
+        image = image.transpose(Image.ROTATE_180)
+    elif rotation == 270:
+        image = image.transpose(Image.ROTATE_270)
+    if settings.get('flip_h', False):
+        image = image.transpose(Image.FLIP_LEFT_RIGHT)
+    if settings.get('flip_v', False):
+        image = image.transpose(Image.FLIP_TOP_BOTTOM)
 
     # Apply crop if specified
     crop_box = settings.get('crop_box')
