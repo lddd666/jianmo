@@ -53,6 +53,51 @@ python app.py
 
 服务启动后，在浏览器中访问 `http://localhost:5000` 即可使用。
 
+### Windows 用户详细指南
+
+1. **安装 Python**
+   - 访问 https://www.python.org/downloads/
+   - 下载最新版 Python 安装包
+   - 安装时务必勾选 **"Add Python to PATH"**
+   - 安装完成后，打开命令提示符或 PowerShell，验证：
+     ```bash
+     python --version
+     ```
+
+2. **安装 Git**（可选，用于克隆项目）
+   - 访问 https://git-scm.com/downloads
+   - 下载 Windows 版并安装
+
+3. **获取项目代码**
+
+   方式一：使用 Git 克隆
+   ```bash
+   git clone https://github.com/lddd666/jianmo.git
+   cd jianmo
+   ```
+
+   方式二：直接下载
+   - 访问 https://github.com/lddd666/jianmo
+   - 点击绿色 **"Code"** 按钮 → **"Download ZIP"**
+   - 解压后在命令行进入项目目录
+
+4. **安装依赖**
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+5. **运行程序**
+   ```bash
+   python app.py
+   ```
+
+6. **访问页面**
+   - 打开浏览器，访问 `http://localhost:5000`
+   - 上传图片即可开始生成墨水屏壁纸
+
+7. **停止程序**
+   - 在命令行按 `Ctrl + C` 停止服务
+
 ### 生产环境部署
 
 ```bash
