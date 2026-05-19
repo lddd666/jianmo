@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>墨水屏壁纸生成器</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="app-header">
+            <h1>📟 墨水屏壁纸生成器</h1>
+            <p class="subtitle">将彩色图片转换为墨水屏风格的黑白壁纸</p>
+        </header>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Left Panel: Upload & Preview -->
+            <div class="preview-panel">
+                <!-- Upload Area -->
+                <div class="upload-area" id="uploadArea">
+                    <div class="upload-icon">📁</div>
+                    <p class="upload-text">拖拽图片到此处，或点击选择文件</p>
+                    <p class="upload-hint">支持 JPG、PNG、BMP、GIF、WebP、TIFF 格式，最大 50MB</p>
+                    <input type="file" id="fileInput" accept="image/*" hidden>
+                </div>
+
+                <!-- Preview Area -->
+                <div class="preview-area" id="previewArea" style="display: none;">
+                    <div class="preview-toolbar">
+                        <span class="preview-info" id="previewInfo"></span>
+                        <div class="preview-tabs">
+                            <button class="tab-btn active" id="tabEffect" data-tab="effect">效果图</button>
+                            <button class="tab-btn" id="tabOriginal" data-tab="original">原图</button>
+                        </div>
+                        <div class="preview-actions">
+                            <button class="btn btn-sm" id="btnResetImage" title="重新上传">🔄 重新上传</button>
+                        </div>
+                    </div>
+                    <div class="preview-container" id="previewContainer">
+                        <div class="preview-wrapper" id="previewWrapper">
+                            <img id="previewImage" alt="预览图片">
+                            <!-- Crop Overlay -->
+                            <div class="crop-overlay" id="cropOverlay" style="display: none;">
+                                <div class="crop-shade crop-shade-top" id="cropShadeTop"></div>
+                                <div class="crop-shade crop-shade-bottom" id="cropShadeBottom"></div>
+                                <div class="crop-shade crop-shade-left" id="cropShadeLeft"></div>
+                                <div class="crop-shade crop-shade-right" id="cropShadeRight"></div>
+                            <div class="crop-box" id="cropBox">
+                                    <div class="crop-dimensions" id="cropDimensions"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="preview-loading" id="previewLoading" style="display: none;">
+                        <div class="spinner"></div>
+                        <p>正在处理图片...</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Panel: Controls -->
+            <div class="controls-panel">
+                <!-- Device Preset -->
+                <div class="control-section">
+                    <div class="section-header">
+                        <h3 class="section-title">📱 目标设备</h3>
+                        <button class="btn-reset" data-reset="device" title="重置">↺</button>
+                    </div>
+                    <div class="form-group">
+                        <select id="devicePreset" class="form-control">
+                            <option value="">-- 选择设备预设 --</option>
+                            <optgroup label="Kindle">
+                                <option value="kindle_paperwhite">Kindle Paperwhite (1236×1648)</option>
+                                <option value="kindle_oasis">Kindle Oasis (1264×1680)</option>
+                                <option value="kindle_scribe">Kindle Scribe (1860×2480)</option>
+                            </optgroup>
+                            <optgroup label="Kobo">
+                                <option value="kobo_clara_hd">Kobo Clara HD (1072×1448)</option>
+                                <option value="kobo_libra_2">Kobo Libra 2 (1264×1680)</option>
+                                <option value="kobo_sage">Kobo Sage (1440×1920)</option>
+                            </optgroup>
+                            <optgroup label="文石 (Boox)">
+                                <option value="boox_poke_4">Boox Poke 4 (1072×1448)</option>
+                                <option value="boox_poke_5">Boox Poke 5 (1072×1448)</option>
+                                <option value="boox_page">Boox Page (1264×1680)</option>
+                                <option value="boox_note_air">Boox Note Air (1404×1872)</option>
+                                <option value="boox_note_air_2">Boox Note Air 2 (1404×1872)</option>
+                                <option value="boox_tab_ultra">Boox Tab Ultra (1860×2480)</option>
+                                <option value="boox_tab_ultra_c">Boox Tab Ultra C (1860×2480)</option>
+                            </optgroup>
+                            <optgroup label="汉王 (Hanvon)">
+                                <option value="hanvon_n10">汉王 N10 (1404×1872)</option>
+                                <option value="hanvon_n10_mini">汉王 N10 Mini (1448×1072)</option>
+                                <option value="hanvon_n10_max">汉王 N10 Max (1872×2560)</option>
+                            </optgroup>
+                            <optgroup label="掌阅 (iReader)">
+                                <option value="ireader_ocean_3">掌阅 Ocean 3 (1264×1680)</option>
+                                <option value="ireader_c6">掌阅 C6 (1404×1872)</option>
+                                <option value="ireader_c7">掌阅 C7 (1264×1680)</option>
+                                <option value="ireader_smart_3">掌阅 Smart 3 (1404×1872)</option>
+                                <option value="ireader_smart_4">掌阅 Smart 4 (1404×1872)</option>
+                            </optgroup>
+                            <optgroup label="其他阅读器">
+                                <option value="meebook_p78">MeeBook P78 (1404×1872)</option>
+                                <option value="pocketbook_inkpad_4">PocketBook InkPad 4 (1404×1872)</option>
+                            </optgroup>
+                            <optgroup label="手机/平板">
+                                <option value="iphone_se">iPhone SE (750×1334)</option>
+                                <option value="iphone_15">iPhone 15 (1179×2556)</option>
+                                <option value="iphone_15_pro_max">iPhone 15 Pro Max (1290×2796)</option>
+                                <option value="ipad_mini">iPad Mini (1488×2266)</option>
+                                <option value="ipad_air">iPad Air (1640×2360)</option>
+                            </optgroup>
+                            <option value="custom">自定义尺寸</option>
+                        </select>
+                    </div>
+                    <div class="form-row" id="customSizeRow" style="display: none;">
+                        <div class="form-group half">
+                            <label>宽度 (px)</label>
+                            <input type="number" id="customWidth" class="form-control" min="1" max="10000" value="1404">
+                        </div>
+                        <div class="form-group half">
+                            <label>高度 (px)</label>
+                            <input type="number" id="customHeight" class="form-control" min="1" max="10000" value="1872">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>缩放模式</label>
+                        <select id="resizeMode" class="form-control">
+                            <option value="stretch">拉伸 - 强制适配目标尺寸</option>
+                            <option value="fit">适应 - 保持比例，可能有留白</option>
+                            <option value="fill">填充 - 保持比例，裁剪多余部分</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Crop Section -->
+                <div class="control-section">
+                    <div class="section-header">
+                        <h3 class="section-title">✂️ 区域裁剪</h3>
+                        <button class="btn-reset" data-reset="crop" title="重置">↺</button>
+                    </div>
+                    <div class="form-group">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="enableCrop"> 启用区域选择
+                        </label>
+                    </div>
+                    <div id="cropControls" style="display: none;">
+                        <p class="crop-hint">裁剪框按目标设备比例自动锁定，使用滑块选择区域位置</p>
+                        <div class="crop-info" id="cropInfo">
+                            <span id="cropInfoText">裁剪区域：全图</span>
+                        </div>
+                        <div id="cropSliderXGroup" class="form-group" style="display: none;">
+                            <label>水平位置 <span class="slider-value" id="cropSliderXValue">0</span></label>
+                            <input type="range" id="cropSliderX" class="form-range" min="0" max="100" step="1" value="0">
+                        </div>
+                        <div id="cropSliderYGroup" class="form-group" style="display: none;">
+                            <label>垂直位置 <span class="slider-value" id="cropSliderYValue">0</span></label>
+                            <input type="range" id="cropSliderY" class="form-range" min="0" max="100" step="1" value="0">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Grayscale Method -->
+                <div class="control-section">
+                    <div class="section-header">
+                        <h3 class="section-title">🎨 灰度转换</h3>
+                        <button class="btn-reset" data-reset="grayscale" title="重置">↺</button>
+                    </div>
+                    <div class="form-group">
+                        <select id="grayscaleMethod" class="form-control">
+                            <option value="luminosity">亮度加权 (推荐)</option>
+                            <option value="average">平均值</option>
+                            <option value="desaturation">去饱和度</option>
+                            <option value="red_channel">红色通道</option>
+                            <option value="green_channel">绿色通道</option>
+                            <option value="blue_channel">蓝色通道</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Image Adjustments -->
+                <div class="control-section">
+                    <div class="section-header">
+                        <h3 class="section-title">⚙️ 图像调整</h3>
+                        <button class="btn-reset" data-reset="adjustments" title="重置">↺</button>
+                    </div>
+                    <div class="form-group">
+                        <label>对比度 <span class="slider-value" id="contrastValue">1.0</span></label>
+                        <input type="range" id="contrast" class="form-range" min="0" max="3" step="0.05" value="1">
+                    </div>
+                    <div class="form-group">
+                        <label>亮度 <span class="slider-value" id="brightnessValue">1.0</span></label>
+                        <input type="range" id="brightness" class="form-range" min="0" max="3" step="0.05" value="1">
+                    </div>
+                    <div class="form-group">
+                        <label>锐度 <span class="slider-value" id="sharpnessValue">1.0</span></label>
+                        <input type="range" id="sharpness" class="form-range" min="0" max="5" step="0.1" value="1">
+                    </div>
+                    <div class="form-group">
+                        <label>伽马校正 <span class="slider-value" id="gammaValue">1.0</span></label>
+                        <input type="range" id="gamma" class="form-range" min="0.1" max="5" step="0.05" value="1">
+                    </div>
+                    <div class="form-group">
+                        <label>高斯模糊 <span class="slider-value" id="blurValue">0</span></label>
+                        <input type="range" id="blur" class="form-range" min="0" max="10" step="0.5" value="0">
+                    </div>
+                </div>
+
+                <!-- Dithering -->
+                <div class="control-section">
+                    <div class="section-header">
+                        <h3 class="section-title">🔳 抖动算法</h3>
+                        <button class="btn-reset" data-reset="dithering" title="重置">↺</button>
+                    </div>
+                    <div class="form-group">
+                        <select id="ditherMethod" class="form-control">
+                            <option value="none">无抖动 - 灰度保留 (推荐)</option>
+                            <option value="floyd_steinberg">Floyd-Steinberg</option>
+                            <option value="ordered_4">有序抖动 4×4</option>
+                            <option value="ordered_8">有序抖动 8×8</option>
+                            <option value="atkinson">Atkinson</option>
+                            <option value="threshold">固定阈值</option>
+                        </select>
+                    </div>
+                    <div class="form-group" id="thresholdGroup" style="display: none;">
+                        <label>阈值 <span class="slider-value" id="thresholdValue">128</span></label>
+                        <input type="range" id="threshold" class="form-range" min="0" max="255" step="1" value="128">
+                    </div>
+                </div>
+
+                <!-- Other Options -->
+                <div class="control-section">
+                    <div class="section-header">
+                        <h3 class="section-title">🔄 其他选项</h3>
+                        <button class="btn-reset" data-reset="other" title="重置">↺</button>
+                    </div>
+                    <div class="form-group">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="invertColors"> 反转颜色（黑变白，白变黑）
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Output Format -->
+                <div class="control-section">
+                    <div class="section-header">
+                        <h3 class="section-title">💾 输出设置</h3>
+                        <button class="btn-reset" data-reset="output" title="重置">↺</button>
+                    </div>
+                    <div class="form-group">
+                        <label>输出格式</label>
+                        <select id="outputFormat" class="form-control">
+                            <option value="png">PNG (无损)</option>
+                            <option value="bmp">BMP (无压缩)</option>
+                            <option value="jpg">JPEG</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="action-buttons">
+                    <button class="btn btn-primary btn-lg" id="btnPreview" disabled>
+                        👁️ 生成预览
+                    </button>
+                    <button class="btn btn-success btn-lg" id="btnDownload" disabled>
+                        ⬇️ 下载壁纸
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="app-footer">
+            <p>墨水屏壁纸生成器 - 支持多种墨水屏阅读器尺寸</p>
+        </footer>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>
