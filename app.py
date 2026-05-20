@@ -2,17 +2,17 @@ import os
 import uuid
 import json
 from io import BytesIO
-from flask import Flask, render_template, request, jsonify, send_file, session
+from flask import Flask, render_template, request, jsonify, send_file
 from PIL import Image, ImageOps, ImageEnhance, ImageFilter
 import numpy as np
 
 app = Flask(__name__)
-app.secret_key = os.urandom(24)
-app.config['MAX_CONTENT_LENGTH'] = 50 * 1024 * 1024  # 50MB max upload
-app.config['UPLOAD_FOLDER'] = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'uploads')
+app.secret_key = os.environ.get('SECRET_KEY', os.urandom(24).hex())
+app.config['MAX_CONTENT_LENGTH'] = 10 * 1024 * 1024  # 10MB max upload
 
-# Ensure upload directory exists
-os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
+# In-memory image storage (keyed by image_id)
+# This avoids reliance on ephemeral filesystem on Render.com
+image_store = {}
 
 # Allowed file extensions
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'bmp', 'gif', 'webp', 'tiff'}
@@ -355,21 +355,24 @@ def upload_image():
         # Generate unique ID for this image
         image_id = str(uuid.uuid4())
 
-        # Store in session
-        if 'images' not in session:
-            session['images'] = {}
+        # Convert image to bytes for in-memory storage
+        buf = BytesIO()
+        image.save(buf, format='PNG')
+        buf.seek(0)
 
-        # Save original image temporarily
-        original_path = os.path.join(app.config['UPLOAD_FOLDER'], f'{image_id}_original.png')
-        image.save(original_path, 'PNG')
-
-        session['images'][image_id] = {
-            'original_path': original_path,
+        # Store in memory (dict) instead of filesystem
+        image_store[image_id] = {
+            'data': buf.getvalue(),
             'width': image.width,
             'height': image.height,
             'filename': file.filename
         }
-        session.modified = True
+
+        # Limit stored images to prevent memory issues (keep last 50)
+        if len(image_store) > 50:
+            oldest_keys = list(image_store.keys())[:-50]
+            for key in oldest_keys:
+                del image_store[key]
 
         return jsonify({
             'success': True,
@@ -390,13 +393,13 @@ def preview_image():
     if not image_id:
         return jsonify({'error': '缺少图片ID'}), 400
 
-    # Load original image
-    original_path = os.path.join(app.config['UPLOAD_FOLDER'], f'{image_id}_original.png')
-    if not os.path.exists(original_path):
+    # Load original image from memory store
+    stored = image_store.get(image_id)
+    if not stored:
         return jsonify({'error': '图片未找到，请重新上传'}), 404
 
     try:
-        image = Image.open(original_path)
+        image = Image.open(BytesIO(stored['data']))
         settings = data.get('settings', {})
         processed = process_image(image, settings)
 
@@ -423,12 +426,13 @@ def download_image():
     if not image_id:
         return jsonify({'error': '缺少图片ID'}), 400
 
-    original_path = os.path.join(app.config['UPLOAD_FOLDER'], f'{image_id}_original.png')
-    if not os.path.exists(original_path):
+    # Load original image from memory store
+    stored = image_store.get(image_id)
+    if not stored:
         return jsonify({'error': '图片未找到，请重新上传'}), 404
 
     try:
-        image = Image.open(original_path)
+        image = Image.open(BytesIO(stored['data']))
         settings = data.get('settings', {})
         output_format = data.get('format', 'png').lower()
 
@@ -459,12 +463,12 @@ def download_image():
 @app.route('/api/original/<image_id>')
 def get_original_image(image_id):
     """Return the original uploaded image without any processing"""
-    original_path = os.path.join(app.config['UPLOAD_FOLDER'], f'{image_id}_original.png')
-    if not os.path.exists(original_path):
+    stored = image_store.get(image_id)
+    if not stored:
         return jsonify({'error': '图片未找到'}), 404
 
     try:
-        image = Image.open(original_path)
+        image = Image.open(BytesIO(stored['data']))
 
         # Generate preview-size version for web display
         preview = image.copy()
@@ -483,15 +487,14 @@ def get_original_image(image_id):
 
 @app.route('/api/cleanup', methods=['POST'])
 def cleanup():
-    """Clean up uploaded files"""
+    """Clean up uploaded images from memory"""
     data = request.json
     image_id = data.get('image_id')
-    if image_id:
-        original_path = os.path.join(app.config['UPLOAD_FOLDER'], f'{image_id}_original.png')
-        if os.path.exists(original_path):
-            os.remove(original_path)
+    if image_id and image_id in image_store:
+        del image_store[image_id]
     return jsonify({'success': True})
 
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000, debug=True)
+    port = int(os.environ.get('PORT', 5000))
+    app.run(host='0.0.0.0', port=port, debug=os.environ.get('FLASK_DEBUG', 'false').lower() == 'true')
