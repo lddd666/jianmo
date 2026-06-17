@@ -15,8 +15,65 @@
             <p class="subtitle">E-ink Wallpaper Studio</p>
         </header>
 
+        <!-- Hero: first-screen visual showcase -->
+        <section class="hero-section">
+            <div class="hero-copy">
+                <p class="eyebrow">为墨水屏而生的壁纸生成器</p>
+                <h2>把照片，变成一张安静的墨水屏壁纸</h2>
+                <p class="hero-description">上传任意图片，一键生成适合 Kindle、文石、掌阅、Kobo 等设备的黑白灰度壁纸。</p>
+                <div class="hero-tags">
+                    <span>无需安装</span>
+                    <span>一键适配设备</span>
+                    <span>复古纸墨质感</span>
+                    <span>适合晒图分享</span>
+                </div>
+                <button class="btn btn-primary hero-cta" id="btnStartCreate">开始生成壁纸</button>
+            </div>
+            <div class="hero-showcase" aria-label="墨水屏壁纸效果展示">
+                <div class="showcase-card original-card">
+                    <span class="showcase-label">原图</span>
+                    <div class="showcase-art color-art"></div>
+                </div>
+                <div class="showcase-arrow">→</div>
+                <div class="showcase-card ink-card">
+                    <span class="showcase-label">墨水屏效果</span>
+                    <div class="showcase-art ink-art"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Inspiration examples -->
+        <section class="example-section">
+            <div class="section-heading">
+                <p class="eyebrow">灵感示例</p>
+                <h2>先选一种你想要的纸墨风格</h2>
+            </div>
+            <div class="example-grid">
+                <button class="example-card" data-preset="📖 Kindle漫画" type="button">
+                    <div class="example-preview manga-preview"></div>
+                    <strong>漫画线稿</strong>
+                    <span>适合 Kindle 漫画封面感</span>
+                </button>
+                <button class="example-card" data-preset="📚 电子书封面" type="button">
+                    <div class="example-preview cover-preview"></div>
+                    <strong>电子书封面</strong>
+                    <span>清晰灰阶，保留照片层次</span>
+                </button>
+                <button class="example-card" data-preset="🎨 复古艺术风" type="button">
+                    <div class="example-preview retro-preview"></div>
+                    <strong>复古艺术风</strong>
+                    <span>颗粒感更强，适合氛围图</span>
+                </button>
+                <button class="example-card" data-preset="📄 文字扫描件" type="button">
+                    <div class="example-preview text-preview"></div>
+                    <strong>文字扫描件</strong>
+                    <span>高对比黑白，适合文档照片</span>
+                </button>
+            </div>
+        </section>
+
         <!-- Main Content -->
-        <div class="main-content">
+        <div class="main-content" id="workspace">
             <!-- Left Panel: Upload & Preview -->
             <div class="preview-panel">
                 <!-- Upload Area -->

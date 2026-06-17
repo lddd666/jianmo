@@ -273,6 +273,7 @@ const btnFlipV = $('#btnFlipV');
 const btnPreview = $('#btnPreview');
 const btnDownload = $('#btnDownload');
 const btnResetImage = $('#btnResetImage');
+const btnStartCreate = $('#btnStartCreate');
 const tabEffect = $('#tabEffect');
 const tabOriginal = $('#tabOriginal');
 
@@ -593,6 +594,40 @@ function initPresetSystem() {
         refreshPresetList();
 
         showToast(`预设 "${name}" 已删除`, 'success');
+    });
+}
+
+function initLandingExperience() {
+    if (btnStartCreate) {
+        btnStartCreate.addEventListener('click', () => {
+            const workspace = $('#workspace');
+            if (workspace) {
+                workspace.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+            setTimeout(() => fileInput.focus(), 450);
+        });
+    }
+
+    document.querySelectorAll('.example-card[data-preset]').forEach(card => {
+        card.addEventListener('click', () => {
+            const presetKey = card.dataset.preset;
+            const settings = BUILTIN_PRESETS[presetKey];
+            if (!settings) return;
+
+            applySettingsToControls(settings);
+            presetSelect.value = presetKey;
+            btnLoadPreset.disabled = false;
+            btnDeletePreset.disabled = true;
+            btnDeletePreset.style.display = 'none';
+
+            showToast(state.imageId ? `已应用「${presetKey}」风格` : `已选择「${presetKey}」，上传图片即可生成类似效果`, 'success');
+            if (state.imageId) {
+                setTimeout(() => generatePreview(), 200);
+            } else {
+                const workspace = $('#workspace');
+                if (workspace) workspace.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        });
     });
 }
 
@@ -1320,6 +1355,7 @@ function init() {
     initResetButtons();
     initTabs();
     initPresetSystem();
+    initLandingExperience();
     initAccordion();
 }
 
