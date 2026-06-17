@@ -273,12 +273,19 @@ const btnFlipV = $('#btnFlipV');
 const btnPreview = $('#btnPreview');
 const btnDownload = $('#btnDownload');
 const btnResetImage = $('#btnResetImage');
+const tabCompare = $('#tabCompare');
 const btnStartCreate = $('#btnStartCreate');
 const tabEffect = $('#tabEffect');
+const compareViewer = $('#compareViewer');
+const compareOriginalImage = $('#compareOriginalImage');
+const compareEffectImage = $('#compareEffectImage');
+const compareEffectLayer = $('#compareEffectLayer');
+const compareSlider = $('#compareSlider');
 const tabOriginal = $('#tabOriginal');
 
-// Current display mode: 'effect' or 'original'
-let currentTab = 'effect';
+// Current display mode: 'compare', 'effect', or 'original'
+let currentTab = 'compare';
+let previewObjectUrl = null;
 
 // Transform state (accumulated)
 let transformState = {
@@ -288,40 +295,71 @@ let transformState = {
 };
 
 // ==================== Tab Switching ====================
+function setActiveTab(tab) {
+    currentTab = tab;
+    tabCompare.classList.toggle('active', tab === 'compare');
+    tabEffect.classList.toggle('active', tab === 'effect');
+    tabOriginal.classList.toggle('active', tab === 'original');
+}
+
+function updateComparePosition() {
+    if (!compareViewer || !compareSlider) return;
+    compareViewer.style.setProperty('--compare-position', `${compareSlider.value}%`);
+}
+
+function updatePreviewDisplay() {
+    const showCompare = currentTab === 'compare' && !state.cropEnabled && compareEffectImage.src && compareOriginalImage.src;
+    compareViewer.style.display = showCompare ? 'block' : 'none';
+    previewImage.style.display = showCompare ? 'none' : 'block';
+    cropOverlay.style.display = state.cropEnabled && currentTab !== 'original' && !showCompare ? 'block' : 'none';
+}
+
+function setPreviewObjectUrl(url) {
+    if (previewObjectUrl) {
+        URL.revokeObjectURL(previewObjectUrl);
+    }
+    previewObjectUrl = url;
+    previewImage.src = url;
+    compareEffectImage.src = url;
+}
+
 function initTabs() {
+    tabCompare.addEventListener('click', () => {
+        if (currentTab === 'compare') return;
+        setActiveTab('compare');
+        if (state.imageId) {
+            if (state.cropEnabled) {
+                showToast('裁剪模式下暂不显示对比滑块，已显示效果图', 'info');
+                setActiveTab('effect');
+            }
+            generatePreview();
+        }
+        updatePreviewDisplay();
+    });
+
     tabEffect.addEventListener('click', () => {
         if (currentTab === 'effect') return;
-        currentTab = 'effect';
-        tabEffect.classList.add('active');
-        tabOriginal.classList.remove('active');
-        // Show crop overlay if enabled
-        if (state.cropEnabled) {
-            cropOverlay.style.display = 'block';
-        }
-        // Reload effect preview
+        setActiveTab('effect');
         if (state.imageId) {
             generatePreview();
         }
+        updatePreviewDisplay();
     });
 
     tabOriginal.addEventListener('click', async () => {
         if (currentTab === 'original' || !state.imageId) return;
-        currentTab = 'original';
-        tabOriginal.classList.add('active');
-        tabEffect.classList.remove('active');
-        // Hide crop overlay when viewing original
-        cropOverlay.style.display = 'none';
+        setActiveTab('original');
 
         try {
             const url = `/api/original/${state.imageId}`;
-            if (previewImage.src.startsWith('blob:')) {
-                URL.revokeObjectURL(previewImage.src);
-            }
             previewImage.src = url;
+            updatePreviewDisplay();
         } catch (err) {
             showToast('加载原图失败', 'error');
         }
     });
+
+    compareSlider.addEventListener('input', updateComparePosition);
 }
 
 // ==================== Toast Notifications ====================
@@ -805,6 +843,13 @@ function resetImage() {
     state.cropEnabled = false;
     cropControls.style.display = 'none';
     cropOverlay.style.display = 'none';
+    compareViewer.style.display = 'none';
+    compareOriginalImage.removeAttribute('src');
+    compareEffectImage.removeAttribute('src');
+    if (previewObjectUrl) {
+        URL.revokeObjectURL(previewObjectUrl);
+        previewObjectUrl = null;
+    }
 }
 
 // ==================== Settings Collection ====================
@@ -863,14 +908,11 @@ function getSettings() {
 async function generatePreview() {
     if (!state.imageId || state.isProcessing) return;
 
-    // Switch to effect tab if viewing original
     if (currentTab === 'original') {
-        currentTab = 'effect';
-        tabEffect.classList.add('active');
-        tabOriginal.classList.remove('active');
-        if (state.cropEnabled) {
-            cropOverlay.style.display = 'block';
-        }
+        setActiveTab('effect');
+    }
+    if (currentTab === 'compare' && state.cropEnabled) {
+        setActiveTab('effect');
     }
 
     state.isProcessing = true;
@@ -903,11 +945,10 @@ async function generatePreview() {
         const blob = await response.blob();
         const url = URL.createObjectURL(blob);
 
-        if (previewImage.src.startsWith('blob:')) {
-            URL.revokeObjectURL(previewImage.src);
-        }
-
-        previewImage.src = url;
+        setPreviewObjectUrl(url);
+        compareOriginalImage.src = `/api/original/${state.imageId}`;
+        updateComparePosition();
+        updatePreviewDisplay();
 
         previewImage.onload = () => {
             if (state.cropEnabled) {
@@ -919,6 +960,7 @@ async function generatePreview() {
                 }
                 applyCropFromSliders();
             }
+            updatePreviewDisplay();
         };
     } catch (err) {
         showToast('预览生成失败: ' + err.message, 'error');
@@ -1168,11 +1210,15 @@ function initCrop() {
     enableCrop.addEventListener('change', () => {
         state.cropEnabled = enableCrop.checked;
         cropControls.style.display = state.cropEnabled ? 'block' : 'none';
-        cropOverlay.style.display = state.cropEnabled ? 'block' : 'none';
+        if (state.cropEnabled && currentTab === 'compare') {
+            setActiveTab('effect');
+            showToast('裁剪模式下暂不显示对比滑块，已切换到效果图', 'info');
+        }
         if (state.cropEnabled) {
             resetCropBox();
             updateCropOverlay();
         }
+        updatePreviewDisplay();
     });
 
     // Recalculate crop when device changes

@@ -11,6 +11,7 @@
     <div class="app-container">
         <!-- Header -->
         <header class="app-header">
+            <div class="brand-mark">渐</div>
             <h1>渐墨</h1>
             <p class="subtitle">E-ink Wallpaper Studio</p>
         </header>
@@ -89,7 +90,8 @@
                     <div class="preview-toolbar">
                         <span class="preview-info" id="previewInfo"></span>
                         <div class="preview-tabs">
-                            <button class="tab-btn active" id="tabEffect" data-tab="effect">效果图</button>
+                            <button class="tab-btn active" id="tabCompare" data-tab="compare">对比</button>
+                            <button class="tab-btn" id="tabEffect" data-tab="effect">效果图</button>
                             <button class="tab-btn" id="tabOriginal" data-tab="original">原图</button>
                         </div>
                         <div class="preview-actions">
@@ -98,6 +100,16 @@
                     </div>
                     <div class="preview-container" id="previewContainer">
                         <div class="preview-wrapper" id="previewWrapper">
+                            <div class="compare-viewer" id="compareViewer" style="display: none; --compare-position: 50%;">
+                                <img id="compareOriginalImage" class="compare-image compare-original" alt="原图对比">
+                                <div class="compare-effect-layer" id="compareEffectLayer">
+                                    <img id="compareEffectImage" class="compare-image compare-effect" alt="效果图对比">
+                                </div>
+                                <div class="compare-divider" id="compareDivider"><span></span></div>
+                                <input type="range" id="compareSlider" class="compare-slider" min="0" max="100" value="50" aria-label="拖动查看前后对比">
+                                <div class="compare-badge compare-before">Before</div>
+                                <div class="compare-badge compare-after">After</div>
+                            </div>
                             <img id="previewImage" alt="预览图片">
                             <!-- Crop Overlay -->
                             <div class="crop-overlay" id="cropOverlay" style="display: none;">
@@ -374,12 +386,12 @@
                 </div>
 
                 <!-- Crop Section (expanded) -->
-                <div class="control-section" data-section="crop">
+                <div class="control-section collapsed" data-section="crop">
                     <div class="section-header" data-toggle="crop">
                         <h3 class="section-title">✂️ 区域裁剪</h3>
                         <div class="section-header-actions">
                             <button class="btn-reset" data-reset="crop" title="重置" onclick="event.stopPropagation()">↺</button>
-                            <span class="collapse-icon">▼</span>
+                            <span class="collapse-icon">▶</span>
                         </div>
                     </div>
                     <div class="section-body">
@@ -489,12 +501,12 @@
                 </div>
 
                 <!-- Transform & Other Options (expanded) -->
-                <div class="control-section" data-section="other">
+                <div class="control-section collapsed" data-section="other">
                     <div class="section-header" data-toggle="other">
                         <h3 class="section-title">🔄 旋转翻转 & 其他</h3>
                         <div class="section-header-actions">
                             <button class="btn-reset" data-reset="other" title="重置" onclick="event.stopPropagation()">↺</button>
-                            <span class="collapse-icon">▼</span>
+                            <span class="collapse-icon">▶</span>
                         </div>
                     </div>
                     <div class="section-body">

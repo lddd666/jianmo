@@ -43,9 +43,12 @@ body {
     min-height: 100vh;
     /* Subtle paper texture via CSS */
     background-image:
+        linear-gradient(rgba(255,255,255,0.24) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.18) 1px, transparent 1px),
         radial-gradient(ellipse at 20% 50%, rgba(74, 111, 165, 0.03) 0%, transparent 50%),
         radial-gradient(ellipse at 80% 20%, rgba(26, 26, 46, 0.02) 0%, transparent 50%),
         radial-gradient(ellipse at 50% 80%, rgba(106, 106, 130, 0.02) 0%, transparent 50%);
+    background-size: 34px 34px, 34px 34px, auto, auto, auto;
     background-attachment: fixed;
 }
 
@@ -70,6 +73,23 @@ body {
     box-shadow: var(--shadow-lg);
     position: relative;
     overflow: hidden;
+}
+
+.brand-mark {
+    width: 48px;
+    height: 48px;
+    margin: 0 auto 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid rgba(255,255,255,0.74);
+    color: rgba(255,255,255,0.9);
+    font-size: 1.35rem;
+    font-weight: 800;
+    letter-spacing: 0;
+    border-radius: 12px;
+    transform: rotate(-6deg);
+    box-shadow: inset 0 0 0 1px rgba(26,26,46,0.22);
 }
 
 /* Ink wash decorative circles */
@@ -131,6 +151,18 @@ body {
     box-shadow: var(--shadow-lg);
     overflow: hidden;
     position: relative;
+}
+
+.hero-section::after {
+    content: 'JIANMO';
+    position: absolute;
+    right: 26px;
+    bottom: 14px;
+    color: rgba(26, 26, 46, 0.05);
+    font-size: clamp(2.8rem, 8vw, 7rem);
+    font-weight: 900;
+    letter-spacing: 0.08em;
+    pointer-events: none;
 }
 
 .hero-section::before {
@@ -211,6 +243,8 @@ body {
     border-radius: 18px;
     box-shadow: var(--shadow-md);
     transform: rotate(-2deg);
+    background-image: linear-gradient(rgba(26,26,46,0.025) 1px, transparent 1px);
+    background-size: 100% 9px;
 }
 
 .ink-card {
@@ -296,6 +330,7 @@ body {
     box-shadow: var(--shadow);
     cursor: pointer;
     transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+    background-image: radial-gradient(circle at 24% 18%, rgba(26,26,46,0.04), transparent 24%), linear-gradient(rgba(255,255,255,0.45), rgba(255,255,255,0));
 }
 
 .example-card:hover {
@@ -486,6 +521,102 @@ body {
     border: 1px solid var(--border-light);
     box-shadow: 0 2px 12px rgba(0,0,0,0.08);
 }
+
+.compare-viewer {
+    position: relative;
+    display: block;
+    max-width: 100%;
+    border: 1px solid var(--border-light);
+    box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+    overflow: hidden;
+    background: var(--bg-card);
+    line-height: 0;
+}
+
+.compare-image {
+    display: block;
+    max-width: 100%;
+    max-height: 70vh;
+    width: auto;
+    height: auto;
+    border: none !important;
+    box-shadow: none !important;
+    user-select: none;
+    pointer-events: none;
+}
+
+.compare-effect-layer {
+    position: absolute;
+    inset: 0;
+    width: var(--compare-position);
+    overflow: hidden;
+}
+
+.compare-effect {
+    max-width: none;
+    height: 100%;
+}
+
+.compare-divider {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: var(--compare-position);
+    width: 2px;
+    background: rgba(255,255,255,0.9);
+    box-shadow: 0 0 0 1px rgba(26,26,46,0.2), 0 0 18px rgba(26,26,46,0.16);
+    transform: translateX(-1px);
+    pointer-events: none;
+}
+
+.compare-divider span {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: var(--ink-dark);
+    border: 2px solid var(--bg-card);
+    transform: translate(-50%, -50%);
+}
+
+.compare-divider span::before {
+    content: '↔';
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 0.9rem;
+    line-height: 1;
+}
+
+.compare-slider {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    cursor: ew-resize;
+}
+
+.compare-badge {
+    position: absolute;
+    top: 12px;
+    padding: 5px 10px;
+    border-radius: 999px;
+    background: rgba(26, 26, 46, 0.78);
+    color: white;
+    font-size: 0.72rem;
+    font-weight: 700;
+    line-height: 1;
+    letter-spacing: 0.04em;
+}
+
+.compare-before { left: 12px; }
+.compare-after { right: 12px; }
 
 /* ==================== Crop Overlay ==================== */
 .crop-overlay {
@@ -1021,17 +1152,24 @@ body {
 
 @media (max-width: 640px) {
     .app-container {
-        padding: 12px;
+        padding: 10px;
     }
 
     .app-header {
-        padding: 32px 16px 28px;
-        margin-bottom: 16px;
+        padding: 20px 14px 18px;
+        margin-bottom: 12px;
+    }
+
+    .brand-mark {
+        width: 38px;
+        height: 38px;
+        margin-bottom: 8px;
+        font-size: 1.05rem;
     }
 
     .app-header h1 {
-        font-size: 2rem;
-        letter-spacing: 8px;
+        font-size: 1.78rem;
+        letter-spacing: 7px;
     }
 
     .subtitle {
@@ -1040,11 +1178,29 @@ body {
     }
 
     .hero-section {
-        padding: 22px;
+        padding: 18px;
+        gap: 16px;
+        margin-bottom: 16px;
+    }
+
+    .hero-copy h2 {
+        font-size: 1.85rem;
+        margin-bottom: 10px;
     }
 
     .hero-description {
-        font-size: 0.94rem;
+        font-size: 0.9rem;
+        margin-bottom: 12px;
+    }
+
+    .hero-tags {
+        gap: 7px;
+        margin-bottom: 16px;
+    }
+
+    .hero-tags span {
+        padding: 5px 9px;
+        font-size: 0.76rem;
     }
 
     .hero-showcase {
@@ -1063,15 +1219,55 @@ body {
     }
 
     .showcase-art {
-        height: 170px;
+        height: 138px;
+    }
+
+    .example-section {
+        margin-bottom: 16px;
     }
 
     .example-grid {
-        grid-template-columns: 1fr;
+        display: flex;
+        overflow-x: auto;
+        scroll-snap-type: x mandatory;
+        padding-bottom: 4px;
+    }
+
+    .example-card {
+        min-width: 72%;
+        scroll-snap-align: start;
+    }
+
+    .example-preview {
+        height: 88px;
     }
 
     .upload-area {
-        padding: 40px 20px;
+        padding: 28px 18px;
+    }
+
+    .upload-icon {
+        font-size: 2.6rem;
+        margin-bottom: 10px;
+    }
+
+    .preview-toolbar {
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+
+    .preview-tabs {
+        order: 3;
+        width: 100%;
+    }
+
+    .tab-btn {
+        flex: 1;
+    }
+
+    .compare-image,
+    .preview-wrapper img {
+        max-height: 58vh;
     }
 
     .section-body {
