@@ -79,7 +79,6 @@ EINK_PRESETS = {
     "boox_obook_5": {"name": "OBOOK 5", "width": 720, "height": 1280},
     # 汉王 (Hanvon)
     "hanvon_n10": {"name": "汉王 N10", "width": 1404, "height": 1872},
-    "hanvon_dumo_nana": {"name": "读墨 Nana", "width": 1264, "height": 1680},
     "hanvon_n10_plus": {"name": "汉王 N10 Plus", "width": 1404, "height": 1872},
     "hanvon_n10_mini": {"name": "汉王 N10 Mini", "width": 1448, "height": 1072},
     "hanvon_n10_max": {"name": "汉王 N10 Max", "width": 1872, "height": 2560},
@@ -136,11 +135,10 @@ EINK_PRESETS = {
     "tolino_shine_4": {"name": "Tolino Shine 4", "width": 1072, "height": 1448},
     "tolino_vision_6": {"name": "Tolino Vision 6", "width": 1072, "height": 1448},
     "tolino_epos_3": {"name": "Tolino Epos 3", "width": 1404, "height": 1872},
-    # MeeBook / Likebook
+    # MeeBook
     "meebook_p6": {"name": "MeeBook P6", "width": 1072, "height": 1448},
     "meebook_p78": {"name": "MeeBook P78", "width": 1404, "height": 1872},
     "meebook_p10_pro": {"name": "MeeBook P10 Pro", "width": 1404, "height": 1872},
-    "likebook_mars": {"name": "Likebook Mars", "width": 1404, "height": 1872},
     "meebook_m8c": {"name": "MeeBook M8C", "width": 1404, "height": 1872},
     # 海信 (Hisense) 墨水屏手机
     "hisense_a5": {"name": "海信 A5", "width": 720, "height": 1520},
@@ -164,10 +162,6 @@ EINK_PRESETS = {
     "iflytek_t2": {"name": "讯飞 T2", "width": 1404, "height": 1872},
     "iflytek_air": {"name": "讯飞 Air", "width": 1404, "height": 1872},
     "iflytek_fika": {"name": "讯飞 Fika", "width": 1072, "height": 1448},
-    # reMarkable / Supernote
-    "remarkable_2": {"name": "reMarkable 2", "width": 1404, "height": 1872},
-    "supernote_a5x": {"name": "Supernote A5 X", "width": 1404, "height": 1872},
-    "fujitsu_quaderno_a4": {"name": "Fujitsu Quaderno A4", "width": 1650, "height": 2200},
     # 手机/平板
     "iphone_se": {"name": "iPhone SE", "width": 750, "height": 1334},
     "iphone_15": {"name": "iPhone 15", "width": 1179, "height": 2556},
@@ -175,6 +169,11 @@ EINK_PRESETS = {
     "ipad_mini": {"name": "iPad Mini", "width": 1488, "height": 2266},
     "ipad_air": {"name": "iPad Air", "width": 1640, "height": 2360},
     # 其他小众品牌
+    "hanvon_dumo_nana": {"name": "读墨 Nana", "width": 1264, "height": 1680},
+    "likebook_mars": {"name": "Likebook Mars", "width": 1404, "height": 1872},
+    "remarkable_2": {"name": "reMarkable 2", "width": 1404, "height": 1872},
+    "supernote_a5x": {"name": "Supernote A5 X", "width": 1404, "height": 1872},
+    "fujitsu_quaderno_a4": {"name": "Fujitsu Quaderno A4", "width": 1650, "height": 2200},
     "durobo_krono": {"name": "Durobo Krono", "width": 1404, "height": 1872},
     "mofei_m4": {"name": "墨非 M4", "width": 480, "height": 800},
     "nook_7": {"name": "Nook 7", "width": 1264, "height": 1680},

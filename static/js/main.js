@@ -162,7 +162,6 @@ const presets = {
     boox_xiaobai_p6_plus: { width: 824, height: 1648 },
     boox_obook_5: { width: 720, height: 1280 },
     // 汉王 (Hanvon)
-    hanvon_dumo_nana: { width: 1264, height: 1680 },
     hanvon_n10: { width: 1404, height: 1872 },
     hanvon_n10_plus: { width: 1404, height: 1872 },
     hanvon_n10_mini: { width: 1448, height: 1072 },
@@ -190,9 +189,15 @@ const presets = {
     ireader_smart_3: { width: 1404, height: 1872 },
     ireader_smart_4: { width: 1404, height: 1872 },
     ireader_smart_6_pro: { width: 1860, height: 2480 },
-    // 其他
+    // MeeBook
     meebook_p78: { width: 1404, height: 1872 },
     meebook_m8c: { width: 1404, height: 1872 },
+    // 其他小众品牌
+    hanvon_dumo_nana: { width: 1264, height: 1680 },
+    likebook_mars: { width: 1404, height: 1872 },
+    remarkable_2: { width: 1404, height: 1872 },
+    supernote_a5x: { width: 1404, height: 1872 },
+    fujitsu_quaderno_a4: { width: 1650, height: 2200 },
     pocketbook_inkpad_4: { width: 1404, height: 1872 },
     bigme_751c: { width: 1264, height: 1680 },
     bigme_hibreak_pro: { width: 824, height: 1648 },
