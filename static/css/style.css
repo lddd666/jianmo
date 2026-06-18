@@ -224,6 +224,37 @@ body {
     font-weight: 600;
 }
 
+.hero-proof {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 10px;
+    max-width: 520px;
+    margin: 0 0 22px;
+}
+
+.hero-proof div {
+    padding: 12px 14px;
+    background: rgba(255, 253, 248, 0.78);
+    border: 1px solid var(--border-light);
+    border-radius: 14px;
+    box-shadow: var(--shadow);
+}
+
+.hero-proof strong {
+    display: block;
+    color: var(--ink-dark);
+    font-size: 1.45rem;
+    line-height: 1;
+}
+
+.hero-proof span {
+    display: block;
+    margin-top: 5px;
+    color: var(--text-muted);
+    font-size: 0.78rem;
+    font-weight: 600;
+}
+
 .hero-cta {
     min-width: 168px;
 }
@@ -444,6 +475,23 @@ body {
 .upload-hint {
     font-size: 0.85rem;
     color: var(--text-muted);
+}
+
+.upload-chips {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 18px;
+}
+
+.upload-chips span {
+    padding: 6px 10px;
+    border-radius: 999px;
+    background: var(--bg-dark);
+    color: var(--ink-mid);
+    font-size: 0.78rem;
+    font-weight: 700;
 }
 
 /* ==================== Preview Area ==================== */
@@ -695,6 +743,28 @@ body {
     color: var(--text-muted);
     font-weight: 500;
     font-size: 0.9rem;
+}
+
+.share-card {
+    margin: 14px 16px 16px;
+    padding: 14px 16px;
+    border: 1px solid rgba(74, 111, 165, 0.24);
+    border-radius: var(--radius);
+    background: linear-gradient(135deg, #f0f4fa, var(--bg-card));
+    color: var(--ink-mid);
+    box-shadow: var(--shadow);
+}
+
+.share-card strong {
+    display: block;
+    color: var(--ink-dark);
+    margin-bottom: 4px;
+}
+
+.share-card span {
+    display: block;
+    color: var(--text-light);
+    font-size: 0.86rem;
 }
 
 /* ==================== Controls Panel (Right) ==================== */
@@ -1203,6 +1273,23 @@ body {
         font-size: 0.76rem;
     }
 
+    .hero-proof {
+        grid-template-columns: 1fr;
+        gap: 8px;
+        margin-bottom: 16px;
+    }
+
+    .hero-proof div {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        padding: 10px 12px;
+    }
+
+    .hero-proof span {
+        margin-top: 0;
+    }
+
     .hero-showcase {
         grid-template-columns: 1fr;
     }
@@ -1244,6 +1331,18 @@ body {
 
     .upload-area {
         padding: 28px 18px;
+    }
+
+    .action-section {
+        position: sticky;
+        bottom: 10px;
+        z-index: 20;
+        border: 1px solid rgba(74, 111, 165, 0.24);
+        box-shadow: var(--shadow-lg);
+    }
+
+    .action-section .btn {
+        min-height: 46px;
     }
 
     .upload-icon {

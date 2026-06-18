@@ -282,6 +282,7 @@ const compareEffectImage = $('#compareEffectImage');
 const compareEffectLayer = $('#compareEffectLayer');
 const compareSlider = $('#compareSlider');
 const tabOriginal = $('#tabOriginal');
+const shareCard = $('#shareCard');
 
 // Current display mode: 'compare', 'effect', or 'original'
 let currentTab = 'compare';
@@ -772,8 +773,8 @@ async function handleFile(file) {
         return;
     }
 
-    if (file.size > 50 * 1024 * 1024) {
-        showToast('文件大小超过50MB限制', 'error');
+    if (file.size > 10 * 1024 * 1024) {
+        showToast('文件大小超过10MB限制', 'error');
         return;
     }
 
@@ -810,6 +811,7 @@ async function handleFile(file) {
 
         btnPreview.disabled = false;
         btnDownload.disabled = false;
+        if (shareCard) shareCard.style.display = 'block';
 
         showToast('图片上传成功', 'success');
     } catch (err) {
@@ -844,6 +846,7 @@ function resetImage() {
     cropControls.style.display = 'none';
     cropOverlay.style.display = 'none';
     compareViewer.style.display = 'none';
+    if (shareCard) shareCard.style.display = 'none';
     compareOriginalImage.removeAttribute('src');
     compareEffectImage.removeAttribute('src');
     if (previewObjectUrl) {
@@ -1016,7 +1019,7 @@ async function downloadImage() {
         document.body.removeChild(a);
         URL.revokeObjectURL(url);
 
-        showToast('下载成功', 'success');
+        showToast('下载成功，适合直接拿去小红书晒图', 'success');
     } catch (err) {
         showToast('下载失败: ' + err.message, 'error');
     } finally {

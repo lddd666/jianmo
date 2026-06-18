@@ -19,14 +19,19 @@
         <!-- Hero: first-screen visual showcase -->
         <section class="hero-section">
             <div class="hero-copy">
-                <p class="eyebrow">为墨水屏而生的壁纸生成器</p>
-                <h2>把照片，变成一张安静的墨水屏壁纸</h2>
-                <p class="hero-description">上传任意图片，一键生成适合 Kindle、文石、掌阅、Kobo 等设备的黑白灰度壁纸。</p>
+                <p class="eyebrow">小红书同款氛围感墨水屏壁纸</p>
+                <h2>把普通照片，做成想收藏的 Kindle 风壁纸</h2>
+                <p class="hero-description">上传照片后自动生成黑白灰纸墨质感，适配 Kindle、文石、掌阅、Kobo，也适合直接拿去晒图种草。</p>
                 <div class="hero-tags">
-                    <span>无需安装</span>
+                    <span>10 秒出图</span>
+                    <span>适合小红书封面</span>
                     <span>一键适配设备</span>
-                    <span>复古纸墨质感</span>
-                    <span>适合晒图分享</span>
+                    <span>复古纸墨氛围</span>
+                </div>
+                <div class="hero-proof" aria-label="使用亮点">
+                    <div><strong>6+</strong><span>常用晒图风格</span></div>
+                    <div><strong>80+</strong><span>设备尺寸预设</span></div>
+                    <div><strong>0</strong><span>安装成本</span></div>
                 </div>
                 <button class="btn btn-primary hero-cta" id="btnStartCreate">开始生成壁纸</button>
             </div>
@@ -47,28 +52,28 @@
         <section class="example-section">
             <div class="section-heading">
                 <p class="eyebrow">灵感示例</p>
-                <h2>先选一种你想要的纸墨风格</h2>
+                <h2>先选一种更容易被点开的晒图风格</h2>
             </div>
             <div class="example-grid">
                 <button class="example-card" data-preset="📖 Kindle漫画" type="button">
                     <div class="example-preview manga-preview"></div>
-                    <strong>漫画线稿</strong>
-                    <span>适合 Kindle 漫画封面感</span>
+                    <strong>漫画线稿封面</strong>
+                    <span>黑白冲击强，适合做笔记封面图</span>
                 </button>
                 <button class="example-card" data-preset="📚 电子书封面" type="button">
                     <div class="example-preview cover-preview"></div>
-                    <strong>电子书封面</strong>
-                    <span>清晰灰阶，保留照片层次</span>
+                    <strong>阅读器氛围照</strong>
+                    <span>层次干净，适合生活方式分享</span>
                 </button>
                 <button class="example-card" data-preset="🎨 复古艺术风" type="button">
                     <div class="example-preview retro-preview"></div>
-                    <strong>复古艺术风</strong>
-                    <span>颗粒感更强，适合氛围图</span>
+                    <strong>复古艺术海报</strong>
+                    <span>颗粒感更强，一眼有旧杂志质感</span>
                 </button>
                 <button class="example-card" data-preset="📄 文字扫描件" type="button">
                     <div class="example-preview text-preview"></div>
-                    <strong>文字扫描件</strong>
-                    <span>高对比黑白，适合文档照片</span>
+                    <strong>书摘扫描感</strong>
+                    <span>高对比黑白，适合书摘/手写内容</span>
                 </button>
             </div>
         </section>
@@ -79,9 +84,15 @@
             <div class="preview-panel">
                 <!-- Upload Area -->
                 <div class="upload-area" id="uploadArea">
-                    <div class="upload-icon">📁</div>
-                    <p class="upload-text">拖拽图片到此处，或点击选择文件</p>
-                    <p class="upload-hint">支持 JPG、PNG、BMP、GIF、WebP、TIFF 格式，最大 10MB</p>
+                    <div class="upload-icon">✨</div>
+                    <p class="upload-text">上传一张照片，马上生成可晒图壁纸</p>
+                    <p class="upload-hint">推荐人像、书桌、旅行、书摘照片 · 支持 JPG、PNG、WebP 等格式，最大 10MB</p>
+                    <div class="upload-chips" aria-label="推荐上传内容">
+                        <span>人像氛围</span>
+                        <span>书桌照片</span>
+                        <span>旅行风景</span>
+                        <span>书摘文字</span>
+                    </div>
                     <input type="file" id="fileInput" accept="image/*" hidden>
                 </div>
 
@@ -126,6 +137,10 @@
                     <div class="preview-loading" id="previewLoading" style="display: none;">
                         <div class="spinner"></div>
                         <p>正在处理图片...</p>
+                    </div>
+                    <div class="share-card" id="shareCard" style="display: none;">
+                        <strong>晒图提示</strong>
+                        <span>下载后可配文：把照片做成墨水屏壁纸，Kindle 氛围感直接拉满。</span>
                     </div>
                 </div>
             </div>
