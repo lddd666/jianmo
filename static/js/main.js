@@ -130,94 +130,23 @@ const BUILTIN_PRESETS = {
     },
 };
 
-// Presets data
-const presets = {
-    // Kindle
-    kindle_paperwhite: { width: 1236, height: 1648 },
-    kindle_2024: { width: 1072, height: 1448 },
-    kindle_paperwhite_2: { width: 758, height: 1024 },
-    kindle_paperwhite_6: { width: 1264, height: 1680 },
-    kindle_oasis_2: { width: 1264, height: 1680 },
-    kindle_oasis: { width: 1264, height: 1680 },
-    kindle_scribe: { width: 1860, height: 2480 },
-    // Kobo
-    kobo_aura: { width: 758, height: 1024 },
-    kobo_clara_hd: { width: 1072, height: 1448 },
-    kobo_libra_2: { width: 1264, height: 1680 },
-    kobo_sage: { width: 1440, height: 1920 },
-    // Boox (文石)
-    boox_poke_4: { width: 1072, height: 1448 },
-    boox_poke_5: { width: 1072, height: 1448 },
-    boox_poke_6: { width: 1072, height: 1448 },
-    boox_leaf_5_plus: { width: 1264, height: 1680 },
-    boox_page: { width: 1264, height: 1680 },
-    boox_note_air: { width: 1404, height: 1872 },
-    boox_note_air_2: { width: 1404, height: 1872 },
-    boox_notex: { width: 1404, height: 1872 },
-    boox_tab_ultra: { width: 1860, height: 2480 },
-    boox_tab_ultra_c: { width: 1860, height: 2480 },
-    boox_p6: { width: 824, height: 1648 },
-    boox_p6_pro: { width: 824, height: 1648 },
-    boox_xiaobai_p6: { width: 824, height: 1648 },
-    boox_xiaobai_p6_plus: { width: 824, height: 1648 },
-    boox_obook_5: { width: 720, height: 1280 },
-    // 汉王 (Hanvon)
-    hanvon_n10: { width: 1404, height: 1872 },
-    hanvon_n10_plus: { width: 1404, height: 1872 },
-    hanvon_n10_mini: { width: 1448, height: 1072 },
-    hanvon_n10_max: { width: 1872, height: 2560 },
-    hanvon_n10pro_3: { width: 1404, height: 1872 },
-    hanvon_cm: { width: 1072, height: 1448 },
-    hanvon_n518: { width: 600, height: 800 },
-    hanvon_e920: { width: 825, height: 1200 },
-    hanvon_k4: { width: 758, height: 1024 },
-    hanvon_k5: { width: 758, height: 1024 },
-    hanvon_kt: { width: 758, height: 1024 },
-    hanvon_7_jinli: { width: 1264, height: 1680 },
-    hanvon_c7t: { width: 1264, height: 1680 },
-    hanvon_c6t: { width: 1072, height: 1448 },
-    hanvon_s10: { width: 1404, height: 1872 },
-    // 掌阅 (iReader)
-    ireader_ocean_3: { width: 1264, height: 1680 },
-    ireader_ocean_4_plus: { width: 1404, height: 1872 },
-    ireader_o5p: { width: 1264, height: 1680 },
-    ireader_tango: { width: 1264, height: 1680 },
-    ireader_light_3: { width: 1072, height: 1448 },
-    ireader_neo_3: { width: 1072, height: 1448 },
-    ireader_c6: { width: 1404, height: 1872 },
-    ireader_c7: { width: 1264, height: 1680 },
-    ireader_smart_3: { width: 1404, height: 1872 },
-    ireader_smart_4: { width: 1404, height: 1872 },
-    ireader_smart_6_pro: { width: 1860, height: 2480 },
-    // MeeBook
-    meebook_p78: { width: 1404, height: 1872 },
-    meebook_m8c: { width: 1404, height: 1872 },
-    // 其他小众品牌
-    hanvon_dumo_nana: { width: 1264, height: 1680 },
-    likebook_mars: { width: 1404, height: 1872 },
-    remarkable_2: { width: 1404, height: 1872 },
-    supernote_a5x: { width: 1404, height: 1872 },
-    fujitsu_quaderno_a4: { width: 1650, height: 2200 },
-    pocketbook_inkpad_4: { width: 1404, height: 1872 },
-    bigme_751c: { width: 1264, height: 1680 },
-    bigme_hibreak_pro: { width: 824, height: 1648 },
-    hisense_touch_lite: { width: 720, height: 1440 },
-    moaan_x: { width: 1404, height: 1872 },
-    iflytek_fika: { width: 1072, height: 1448 },
-    durobo_krono: { width: 1404, height: 1872 },
-    mofei_m4: { width: 480, height: 800 },
-    nook_7: { width: 1264, height: 1680 },
-    bambook_sd968: { width: 600, height: 800 },
-    guowen_xiaofanggao: { width: 720, height: 1280 },
-    yuexingtong_x4: { width: 824, height: 1648 },
-    huawei_matepad_paper: { width: 1404, height: 1872 },
-    // 手机/平板
-    iphone_se: { width: 750, height: 1334 },
-    iphone_15: { width: 1179, height: 2556 },
-    iphone_15_pro_max: { width: 1290, height: 2796 },
-    ipad_mini: { width: 1488, height: 2266 },
-    ipad_air: { width: 1640, height: 2360 },
-};
+let presets = {};
+
+const DEVICE_GROUP_RULES = [
+    { label: 'Kindle', prefixes: ['kindle_'] },
+    { label: 'Kobo', prefixes: ['kobo_'] },
+    { label: '文石 (Boox)', prefixes: ['boox_'] },
+    { label: '汉王 (Hanvon)', prefixes: ['hanvon_'] },
+    { label: '掌阅 (iReader)', prefixes: ['ireader_'] },
+    { label: 'PocketBook', prefixes: ['pocketbook_'] },
+    { label: 'Tolino', prefixes: ['tolino_'] },
+    { label: 'MeeBook', prefixes: ['meebook_'] },
+    { label: '海信 (Hisense)', prefixes: ['hisense_'] },
+    { label: '大我 (Bigme)', prefixes: ['bigme_'] },
+    { label: '墨案 (Moaan)', prefixes: ['moaan_'] },
+    { label: '科大讯飞 (iFlytek)', prefixes: ['iflytek_'] },
+    { label: '手机/平板', prefixes: ['iphone_', 'ipad_'] },
+];
 
 // ==================== DOM Elements ====================
 const $ = (sel) => document.querySelector(sel);
@@ -284,9 +213,82 @@ const compareSlider = $('#compareSlider');
 const tabOriginal = $('#tabOriginal');
 const shareCard = $('#shareCard');
 
+// ==================== Device Presets ====================
+function getDeviceGroupKey(presetKey) {
+    const matched = DEVICE_GROUP_RULES.find(group => group.prefixes.some(prefix => presetKey.startsWith(prefix)));
+    return matched ? matched.label : '其他小众品牌';
+}
+
+function hydratePresetsFromCurrentOptions() {
+    devicePreset.querySelectorAll('option[value]:not([value=""]):not([value="custom"])').forEach(option => {
+        const match = option.textContent.match(/\((\d+)×(\d+)\)/);
+        if (match) {
+            presets[option.value] = {
+                width: Number(match[1]),
+                height: Number(match[2]),
+            };
+        }
+    });
+}
+
+function renderDevicePresetOptions(serverPresets) {
+    const selectedValue = devicePreset.value;
+    const groups = new Map();
+    presets = {};
+
+    Object.entries(serverPresets).forEach(([key, preset]) => {
+        if (key === 'custom') return;
+        presets[key] = { width: preset.width, height: preset.height };
+        const groupKey = getDeviceGroupKey(key);
+        if (!groups.has(groupKey)) groups.set(groupKey, []);
+        groups.get(groupKey).push({ key, ...preset });
+    });
+
+    devicePreset.innerHTML = '<option value="">-- 选择设备预设 --</option>';
+
+    DEVICE_GROUP_RULES.map(group => group.label).concat('其他小众品牌').forEach(label => {
+        const items = groups.get(label);
+        if (!items || items.length === 0) return;
+
+        const optgroup = document.createElement('optgroup');
+        optgroup.label = label;
+        items.forEach(item => {
+            const option = document.createElement('option');
+            option.value = item.key;
+            option.textContent = `${item.name} (${item.width}×${item.height})`;
+            optgroup.appendChild(option);
+        });
+        devicePreset.appendChild(optgroup);
+    });
+
+    const customOption = document.createElement('option');
+    customOption.value = 'custom';
+    customOption.textContent = serverPresets.custom?.name || '自定义尺寸';
+    devicePreset.appendChild(customOption);
+
+    if (selectedValue && devicePreset.querySelector(`option[value="${CSS.escape(selectedValue)}"]`)) {
+        devicePreset.value = selectedValue;
+    }
+}
+
+async function loadDevicePresets() {
+    hydratePresetsFromCurrentOptions();
+
+    try {
+        const response = await fetch('/api/presets');
+        if (!response.ok) throw new Error('presets request failed');
+        const serverPresets = await response.json();
+        renderDevicePresetOptions(serverPresets);
+    } catch (err) {
+        showToast('设备列表加载失败，已使用本地预设', 'error');
+    }
+}
+
 // Current display mode: 'compare', 'effect', or 'original'
 let currentTab = 'compare';
 let previewObjectUrl = null;
+let previewAbortController = null;
+let previewRequestSeq = 0;
 
 // Transform state (accumulated)
 let transformState = {
@@ -822,6 +824,13 @@ async function handleFile(file) {
 }
 
 function resetImage() {
+    if (previewAbortController) {
+        previewAbortController.abort();
+        previewAbortController = null;
+    }
+    previewRequestSeq++;
+    state.isProcessing = false;
+
     if (state.imageId) {
         fetch('/api/cleanup', {
             method: 'POST',
@@ -909,7 +918,14 @@ function getSettings() {
 
 // ==================== Preview Generation ====================
 async function generatePreview() {
-    if (!state.imageId || state.isProcessing) return;
+    if (!state.imageId) return;
+
+    if (previewAbortController) {
+        previewAbortController.abort();
+    }
+
+    const requestSeq = ++previewRequestSeq;
+    previewAbortController = new AbortController();
 
     if (currentTab === 'original') {
         setActiveTab('effect');
@@ -937,7 +953,10 @@ async function generatePreview() {
                 image_id: state.imageId,
                 settings: previewSettings,
             }),
+            signal: previewAbortController.signal,
         });
+
+        if (requestSeq !== previewRequestSeq) return;
 
         if (!response.ok) {
             const errData = await response.json();
@@ -946,6 +965,8 @@ async function generatePreview() {
         }
 
         const blob = await response.blob();
+        if (requestSeq !== previewRequestSeq) return;
+
         const url = URL.createObjectURL(blob);
 
         setPreviewObjectUrl(url);
@@ -966,10 +987,14 @@ async function generatePreview() {
             updatePreviewDisplay();
         };
     } catch (err) {
+        if (err.name === 'AbortError') return;
         showToast('预览生成失败: ' + err.message, 'error');
     } finally {
-        state.isProcessing = false;
-        showLoading(false);
+        if (requestSeq === previewRequestSeq) {
+            state.isProcessing = false;
+            previewAbortController = null;
+            showLoading(false);
+        }
     }
 }
 
@@ -1395,7 +1420,8 @@ function initResizeHandler() {
 }
 
 // ==================== Initialization ====================
-function init() {
+async function init() {
+    await loadDevicePresets();
     initUpload();
     initCrop();
     initControls();
